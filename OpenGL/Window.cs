@@ -27,6 +27,8 @@ namespace OpenGL.Window
             //Create window with given parameters
             GlfwWindowPtr window = Glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello OpenGL", GlfwMonitorPtr.Null, GlfwWindowPtr.Null);
 
+            //-----------------------------------------------------------------------------------------------------------------------
+            //Checks whether the window was successfully initialized, and if not throws an exception
             if (window.Equals(GlfwWindowPtr.Null))
             {
                 Console.WriteLine("Failed to initialize");
@@ -40,6 +42,22 @@ namespace OpenGL.Window
             //GlfwFramebufferSizeFun(window, WINDOW_WIDTH, WINDOW_HEIGHT);
             //Glfw.SetFramebufferSizeCallback(window, GlfwFramebufferSizeFun(window, WINDOW_WIDTH, WINDOW_HEIGHT));
 
+
+
+
+
+            uint VBO = 0;
+
+
+
+
+
+            ShapesTest shapes = new ShapesTest();
+
+
+
+            //-----------------------------------------------------------------------------------------------------------------------
+            //Main loop
             while (!Glfw.WindowShouldClose(window))
             {
                 ProcessInput(window);
@@ -51,6 +69,7 @@ namespace OpenGL.Window
             Glfw.Terminate();
         }
 
+        //-----------------------------------------------------------------------------------------------------------------------
         static void ProcessInput(GlfwWindowPtr inWindow)
         {
             if (Glfw.GetKey(inWindow, Key.Escape))

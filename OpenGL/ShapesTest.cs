@@ -8,7 +8,7 @@ namespace OpenGL
 {
     class ShapesTest
     {
-        public static float[] triangle =
+        public float[] triangle =
         {
             -0.5f, -0.5f, 0.0f,
             0.5f, -0.5f, 0.0f,
