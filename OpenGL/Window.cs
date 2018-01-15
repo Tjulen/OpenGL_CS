@@ -1,7 +1,6 @@
 ﻿using System;
 
-using Pencil.Gaming;
-using OpenTK.Graphics.OpenGL;
+
 
 namespace OpenGL.Window
 {
@@ -13,6 +12,10 @@ namespace OpenGL.Window
 
         public static void Main(string[] args)
         {
+            if (glfw3.Glfw.Init() == 0)
+            {
+                Environment.Exit(-1);
+            }
             if (!Glfw.Init())
             {
                 Environment.Exit(-1);
@@ -21,9 +24,10 @@ namespace OpenGL.Window
             Glfw.WindowHint(target: WindowHint.ContextVersionMinor, hint: 3);
 
             //Commenting this line avoids crashes and abilities to not initialize correctly
+
             //Glfw.WindowHint(target: WindowHint.OpenGLProfile, hint: 139272);
             Glfw.WindowHint(target: WindowHint.OpenGLForwardCompat, hint: 139270);
-
+            OpenGL.Gl.view
             //Create window with given parameters
             GlfwWindowPtr window = Glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello OpenGL", GlfwMonitorPtr.Null, GlfwWindowPtr.Null);
 
@@ -38,21 +42,10 @@ namespace OpenGL.Window
                 Environment.Exit(-1);
             }
 
+            GlfwFramebufferSizeFun frameBufferSizeCallBack = new GlfwFramebufferSizeFun(Framebuffer_size_callback);
+
             Glfw.MakeContextCurrent(window);
-            //GlfwFramebufferSizeFun(window, WINDOW_WIDTH, WINDOW_HEIGHT);
-            //Glfw.SetFramebufferSizeCallback(window, GlfwFramebufferSizeFun(window, WINDOW_WIDTH, WINDOW_HEIGHT));
-
-
-
-
-
-            uint VBO = 0;
-
-
-
-
-
-            ShapesTest shapes = new ShapesTest();
+            Glfw.SetFramebufferSizeCallback(window, frameBufferSizeCallBack);
 
 
 
@@ -77,11 +70,9 @@ namespace OpenGL.Window
                 Glfw.SetWindowShouldClose(inWindow, true);
             }
         }
-
-        //static GlfwFramebufferSizeFun Framebuffer_size_callback(int inWidth, int inHeight)
-        //{
-        //    new GlfwFramebufferSizeFun buffer = GlfwFramebufferSizeFun(window, WINDOW_WIDTH, WINDOW_HEIGHT);
-        //    GL.Viewport(0, 0, inWidth, inHeight);
-        //}
+        static void Framebuffer_size_callback(GlfwWindowPtr window, int width, int height)
+        {
+            GL.Viewport(0, 0, width, height);
+        }
     }
 }
