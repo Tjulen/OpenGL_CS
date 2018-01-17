@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Pencil.Gaming;
 
 
 namespace OpenGL.Window
@@ -12,67 +12,79 @@ namespace OpenGL.Window
 
         public static void Main(string[] args)
         {
-            if (glfw3.Glfw.Init() == 0)
-            {
-                Environment.Exit(-1);
-            }
-            if (!Glfw.Init())
-            {
-                Environment.Exit(-1);
-            }
-            Glfw.WindowHint(target: WindowHint.ContextVersionMajor, hint: 3);
-            Glfw.WindowHint(target: WindowHint.ContextVersionMinor, hint: 3);
 
-            //Commenting this line avoids crashes and abilities to not initialize correctly
-
-            //Glfw.WindowHint(target: WindowHint.OpenGLProfile, hint: 139272);
-            Glfw.WindowHint(target: WindowHint.OpenGLForwardCompat, hint: 139270);
-            OpenGL.Gl.view
-            //Create window with given parameters
-            GlfwWindowPtr window = Glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello OpenGL", GlfwMonitorPtr.Null, GlfwWindowPtr.Null);
-
-            //-----------------------------------------------------------------------------------------------------------------------
-            //Checks whether the window was successfully initialized, and if not throws an exception
-            if (window.Equals(GlfwWindowPtr.Null))
+            if (Glfw.Init() == false)
             {
-                Console.WriteLine("Failed to initialize");
-                Console.WriteLine("Closing...");
-                Glfw.Terminate();
-                Console.ReadKey();
-                Environment.Exit(-1);
+                Console.WriteLine("ERROR: GLFW couldn't initialize, shutting down.");
+                Environment.Exit(1);
             }
 
-            GlfwFramebufferSizeFun frameBufferSizeCallBack = new GlfwFramebufferSizeFun(Framebuffer_size_callback);
 
+            Glfw.WindowHint(WindowHint.ContextVersionMajor, 3);
+            Glfw.WindowHint(WindowHint.ContextVersionMinor, 3);
+            Glfw.WindowHint(WindowHint.OpenGLForwardCompat, 1);
+
+            GlfwWindowPtr window = Glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello", GlfwMonitorPtr.Null, GlfwWindowPtr.Null);
+
+            if (window.Equals(null))
+            {
+                Console.WriteLine("ERROR: Window not initialized correctly, shutting down.");
+                Environment.Exit(1);
+            }
             Glfw.MakeContextCurrent(window);
-            Glfw.SetFramebufferSizeCallback(window, frameBufferSizeCallBack);
+
+            //function pointer pointing to FrameBufferSizeCallBack, and it is passed to SetFramBufferSizeCallback
+            //so that when glfw window is resized it uses this funtion pointer to access the function for "handling"
+            //what happens when the window is resized.
+            GlfwFramebufferSizeFun frameBufferSizeFun = new GlfwFramebufferSizeFun(FrameBufferSizeCallBack);
+            Glfw.SetFramebufferSizeCallback(window, frameBufferSizeFun);
+
+
+            float[] triangle =
+            {
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.0f,  0.5f, 0.0f
+            };
+
+            uint vbo;
+            vbo = Gl.GenBuffer();
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            Gl.BufferData(BufferTarget.ArrayBuffer, System.Runtime.InteropServices.Marshal.SizeOf(triangle), BufferUsage.StaticDraw);
 
 
 
-            //-----------------------------------------------------------------------------------------------------------------------
-            //Main loop
+
             while (!Glfw.WindowShouldClose(window))
             {
-                ProcessInput(window);
+                //input
+                ProcesInput(window);
 
-                Glfw.SwapBuffers(window);
+
+                Gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+                Gl.Clear(ClearBufferMask.ColorBufferBit);
+                Gl.Clear(ClearBufferMask.DepthBufferBit);
+
+
+                //check and call events and swap buffers
                 Glfw.PollEvents();
+                Glfw.SwapBuffers(window);
             }
+
 
             Glfw.Terminate();
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------
-        static void ProcessInput(GlfwWindowPtr inWindow)
+        static void ProcesInput(GlfwWindowPtr window)
         {
-            if (Glfw.GetKey(inWindow, Key.Escape))
+            if (Glfw.GetKey(window, Key.Escape))
             {
-                Glfw.SetWindowShouldClose(inWindow, true);
+                Glfw.SetWindowShouldClose(window, true);
             }
         }
-        static void Framebuffer_size_callback(GlfwWindowPtr window, int width, int height)
+        static void FrameBufferSizeCallBack(GlfwWindowPtr window, int width, int height)
         {
-            GL.Viewport(0, 0, width, height);
+            Gl.Viewport(0, 0, width, height);
         }
     }
 }
