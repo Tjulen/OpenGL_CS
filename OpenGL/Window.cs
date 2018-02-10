@@ -1,90 +1,51 @@
 ﻿using System;
-using Pencil.Gaming;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Input;
 
-
-namespace OpenGL.Window
+namespace OpenTest
 {
-    class Window
+    class Game : GameWindow
     {
-        const int WINDOW_HEIGHT = 600;
-        const int WINDOW_WIDTH = 800;
+        const int WINDOW_WIDTH = 1280;
+        const int WINDOW_HEIGHT = 720;
 
-
-        public static void Main(string[] args)
+        public Game() :
+            base(WINDOW_WIDTH,
+                WINDOW_HEIGHT,
+                OpenTK.Graphics.GraphicsMode.Default,
+                "Hello OpenTK!",
+                GameWindowFlags.Default,
+                DisplayDevice.Default,
+                4,
+                0,
+                OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible)
         {
-
-            if (Glfw.Init() == false)
-            {
-                Console.WriteLine("ERROR: GLFW couldn't initialize, shutting down.");
-                Environment.Exit(1);
-            }
-
-
-            Glfw.WindowHint(WindowHint.ContextVersionMajor, 3);
-            Glfw.WindowHint(WindowHint.ContextVersionMinor, 3);
-            Glfw.WindowHint(WindowHint.OpenGLForwardCompat, 1);
-
-            GlfwWindowPtr window = Glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello", GlfwMonitorPtr.Null, GlfwWindowPtr.Null);
-
-            if (window.Equals(null))
-            {
-                Console.WriteLine("ERROR: Window not initialized correctly, shutting down.");
-                Environment.Exit(1);
-            }
-            Glfw.MakeContextCurrent(window);
-
-            //function pointer pointing to FrameBufferSizeCallBack, and it is passed to SetFramBufferSizeCallback
-            //so that when glfw window is resized it uses this funtion pointer to access the function for "handling"
-            //what happens when the window is resized.
-            GlfwFramebufferSizeFun frameBufferSizeFun = new GlfwFramebufferSizeFun(FrameBufferSizeCallBack);
-            Glfw.SetFramebufferSizeCallback(window, frameBufferSizeFun);
-
-
-            float[] triangle =
-            {
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.0f,  0.5f, 0.0f
-            };
-
-            uint vbo;
-            vbo = Gl.GenBuffer();
-            Gl.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-            Gl.BufferData(BufferTarget.ArrayBuffer, System.Runtime.InteropServices.Marshal.SizeOf(triangle), BufferUsage.StaticDraw);
-
-
-
-
-            while (!Glfw.WindowShouldClose(window))
-            {
-                //input
-                ProcesInput(window);
-
-
-                Gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-                Gl.Clear(ClearBufferMask.ColorBufferBit);
-                Gl.Clear(ClearBufferMask.DepthBufferBit);
-
-
-                //check and call events and swap buffers
-                Glfw.PollEvents();
-                Glfw.SwapBuffers(window);
-            }
-
-
-            Glfw.Terminate();
         }
 
-        static void ProcesInput(GlfwWindowPtr window)
+        protected override void OnLoad(EventArgs e)
         {
-            if (Glfw.GetKey(window, Key.Escape))
-            {
-                Glfw.SetWindowShouldClose(window, true);
-            }
+            base.OnLoad(e);
+
+            GL.ClearColor(System.Drawing.Color.CadetBlue);
         }
-        static void FrameBufferSizeCallBack(GlfwWindowPtr window, int width, int height)
+        protected override void OnRenderFrame(FrameEventArgs e)
         {
-            Gl.Viewport(0, 0, width, height);
+            base.OnRenderFrame(e);
+
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            SwapBuffers();
+        }
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+
+            GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
+        }
+        protected override void OnKeyDown(KeyboardKeyEventArgs e)
+        {
+            base.OnKeyDown(e);
         }
     }
 }
